@@ -10,15 +10,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Background on the data set
 
-a) **Where did you find the data set?  Provide the precise URL where we can find the data file.**
+a)
 
 https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset
 
-b) **Write a brief description providing the context of the data set.  Use your own words, but if there are parts that would be better expressed by the data source description itself, put those parts in quotes with clear attribution, including a reference to where you found that text.  Be sure to describe what an observation in this data set represents and what variables are included and their meaning.**
-
+b) 
 This data set contains tracks/songs found on Spotify, a music streaming platform. The list was created to include 125 distinct genres of music. The process of picking the tracks is unknown. An observation in this data set holds information about a specific track/song. The variables include the Spotify track ID, artists included on the track, album that the track came from, the name of the track, popularity ranked between 0-100, duration of the track, genre, and other numerical variables (such as danceability, key, and instrumentalness) that describe the sound produced from the track. Danceability describes shows "danceable" a track is based on the combined values of tempo, rhythm, beat strength, and other sound components. 
 
-c) **Load the data.  Once the data is loaded, use the `glimpse` function to provide an initial look at the data frame.**
+
 
 ```{r}
 library(tidyverse)
@@ -27,7 +26,7 @@ tracks<- read_csv("Spotify Tracks Dataset.csv")
 glimpse(tracks)
 ```
 
-d) **Make a separate plot for each variable in your data set. Each plot should involve just one variable at a time. If your data set has a very large number of variables, choose the three that you think are most interesting to you. Think about what type of variable each is, and use this to decide on what kind of plot would be most effective.**
+d) **Representing single variables**
 
 ```{r}
 tracks %>% 
@@ -46,7 +45,7 @@ tracks %>%
   ggplot(aes(x = track_genre)) + geom_bar()
 ```
 
-e) **For each plot above, comment on what you see from the plot. Does what you see make sense? Are there any surprises? If there are surprises, explain how you have investigated these surprises (think about how in PS3 we explained all the surprises involving the duration variable).**
+e) 
 ```{r}
 tracks %>% 
   filter(popularity == 0) %>% 
@@ -88,7 +87,7 @@ tracks %>%
 ```
 
 
-g) **Choose a numerical variable and take this as the response variable and fit a linear regression model to predict it based on one or more of the other variables.**
+g) **Linear Regression**
 
 ```{r}
 library(moderndive)
@@ -98,6 +97,6 @@ get_regression_table(fit)
 
 ```
 
-h) **Provide some interpretation of the model you have fit, by discussing the value of one or more of the coefficients that you estimated in your model in part (g).  Are the coefficient values consistent with what you might have expected from your knowledge of the topic covered by the data set? (e.g. if it's a data set about basketball, does the coefficient value match what you might have expected based on your knowledge of basketball?)**
+h) **Interpretation**
 
 The coefficient values are consist with what I expected. Danceability measures how suitable a song is for dancing and is mainly calculated with tempo and energy and can vary within each genre. In this dataset, it is measured between 0 (lowest danceability) and 1 (highest danceability).Genres like death metal have low danceability, while genres like reggaeton have high danceability. As a result, the genres with low danceability have lower coefficients and high danceability have high coefficients.
