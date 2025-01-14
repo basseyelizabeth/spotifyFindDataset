@@ -1,0 +1,103 @@
+---
+title: "Engage-Integrate"
+author: "Your Name"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background on the data set
+
+a) **Where did you find the data set?  Provide the precise URL where we can find the data file.**
+
+https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset
+
+b) **Write a brief description providing the context of the data set.  Use your own words, but if there are parts that would be better expressed by the data source description itself, put those parts in quotes with clear attribution, including a reference to where you found that text.  Be sure to describe what an observation in this data set represents and what variables are included and their meaning.**
+
+This data set contains tracks/songs found on Spotify, a music streaming platform. The list was created to include 125 distinct genres of music. The process of picking the tracks is unknown. An observation in this data set holds information about a specific track/song. The variables include the Spotify track ID, artists included on the track, album that the track came from, the name of the track, popularity ranked between 0-100, duration of the track, genre, and other numerical variables (such as danceability, key, and instrumentalness) that describe the sound produced from the track. Danceability describes shows "danceable" a track is based on the combined values of tempo, rhythm, beat strength, and other sound components. 
+
+c) **Load the data.  Once the data is loaded, use the `glimpse` function to provide an initial look at the data frame.**
+
+```{r}
+library(tidyverse)
+library(dplyr)
+tracks<- read_csv("Spotify Tracks Dataset.csv")
+glimpse(tracks)
+```
+
+d) **Make a separate plot for each variable in your data set. Each plot should involve just one variable at a time. If your data set has a very large number of variables, choose the three that you think are most interesting to you. Think about what type of variable each is, and use this to decide on what kind of plot would be most effective.**
+
+```{r}
+tracks %>% 
+  ggplot(aes(x = popularity)) + geom_histogram()
+
+```
+
+```{r}
+tracks %>% 
+  ggplot(aes(x = duration_ms)) + geom_boxplot()
+```
+
+```{r}
+tracks %>% 
+  group_by(track_genre) %>% 
+  ggplot(aes(x = track_genre)) + geom_bar()
+```
+
+e) **For each plot above, comment on what you see from the plot. Does what you see make sense? Are there any surprises? If there are surprises, explain how you have investigated these surprises (think about how in PS3 we explained all the surprises involving the duration variable).**
+```{r}
+tracks %>% 
+  filter(popularity == 0) %>% 
+  count(track_genre) %>% 
+  arrange(desc(n))
+# I noticed that there were many tracks that had a popularity of 0. I wanted to investigate the genres in this category to see if there was a correlation or pattern. Jazz, Iranian, and Romance were the genres with the highest number of tracks with a popularity of 0. 
+```
+```{r}
+duration_change <- tracks %>%
+  filter(duration_ms != 0) %>% 
+  mutate(duration_min = duration_ms/60000) %>% 
+  arrange(desc(duration_min))
+
+summary(duration_change)
+
+IQR = 4.3584 - 2.9011
+4.3584 + 1.5*IQR
+
+duration_change %>% 
+  filter(duration_min > 6.54435) %>% 
+  group_by(track_genre) %>% 
+  count(track_genre) %>% 
+  arrange(desc(n))
+# From the original plot, there were many extreme outliers on the higher end that I wanted to investigate. I wanted to see if there was a correlation between the genre and the presented outliers. To do this, I calculated the range of the greater outliers and applied that to the data set. The most common genres found in this set are minimal-techno, detroit-techno, and chicago-house. I also converted the duration to minutes so it would be easier for me to understand. 
+```
+
+```{r}
+tracks %>% 
+  count(track_genre)
+# The bar plot seemed strange. With further investigation, there are 114 genres and 1000 tracks for each genre. This explains the shape/distribution of the plot.
+```
+
+f) **Make a plot that could help you understand whether there is an association between two or more variables.**
+
+```{r}
+tracks %>% 
+  filter(popularity >= 50 )%>% 
+  ggplot(aes(x = acousticness, y = loudness, color = energy)) + geom_point(alpha = 0.1)
+```
+
+
+g) **Choose a numerical variable and take this as the response variable and fit a linear regression model to predict it based on one or more of the other variables.**
+
+```{r}
+library(moderndive)
+fit <- lm(danceability ~ tempo * energy + track_genre, data = tracks)
+
+get_regression_table(fit)
+
+```
+
+h) **Provide some interpretation of the model you have fit, by discussing the value of one or more of the coefficients that you estimated in your model in part (g).  Are the coefficient values consistent with what you might have expected from your knowledge of the topic covered by the data set? (e.g. if it's a data set about basketball, does the coefficient value match what you might have expected based on your knowledge of basketball?)**
+
+The coefficient values are consist with what I expected. Danceability measures how suitable a song is for dancing and is mainly calculated with tempo and energy and can vary within each genre. In this dataset, it is measured between 0 (lowest danceability) and 1 (highest danceability).Genres like death metal have low danceability, while genres like reggaeton have high danceability. As a result, the genres with low danceability have lower coefficients and high danceability have high coefficients.
