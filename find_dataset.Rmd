@@ -78,7 +78,7 @@ tracks %>%
 # The bar plot seemed strange. With further investigation, there are 114 genres and 1000 tracks for each genre. This explains the shape/distribution of the plot.
 ```
 
-f) **Make a plot that could help you understand whether there is an association between two or more variables.**
+f) **Checking for association**
 
 ```{r}
 tracks %>% 
